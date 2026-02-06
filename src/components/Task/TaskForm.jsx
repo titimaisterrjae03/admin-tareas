@@ -32,7 +32,7 @@ export function TaskForm({ onSuccess, onCancel }) {
             onSuccess();
         } catch (error) {
             console.error(error);
-            toast.error('Error al guardar la tarea');
+            toast.error('Error al guardar: ' + (error.message || 'Error desconocido'));
         } finally {
             setLoading(false);
         }
