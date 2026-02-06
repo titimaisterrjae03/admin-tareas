@@ -40,13 +40,23 @@ export function TaskForm({ onSuccess, onCancel }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-                label="Asignatura"
-                placeholder="Ej: Cálculo Int."
-                required
-                value={formData.subject}
-                onChange={e => setFormData({ ...formData, subject: e.target.value })}
-            />
+            <div>
+                <label className="text-sm font-medium text-slate-300 block mb-1">Asignatura</label>
+                <select
+                    className="w-full bg-slate-800 border-slate-700 text-slate-100 rounded-lg border focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 p-2 outline-none transition-all appearance-none"
+                    required
+                    value={formData.subject}
+                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                >
+                    <option value="" disabled>Selecciona una asignatura</option>
+                    <option value="ADMINISTRACION DE EMPRESAS">ADMINISTRACION DE EMPRESAS</option>
+                    <option value="ANALISIS Y DISEÑO DE SISTEMAS">ANALISIS Y DISEÑO DE SISTEMAS</option>
+                    <option value="ARQUITECTURA DE REDES DE COMPUTADORES">ARQUITECTURA DE REDES DE COMPUTADORES</option>
+                    <option value="ESTADISTICA APLICADA">ESTADISTICA APLICADA</option>
+                    <option value="SISTEMA DE BASE DE DATOS">SISTEMA DE BASE DE DATOS</option>
+                    <option value="SISTEMA DE OPERACION I">SISTEMA DE OPERACION I</option>
+                </select>
+            </div>
             <Input
                 label="Tema/Tópico"
                 placeholder="Ej: Integrales impropias"
