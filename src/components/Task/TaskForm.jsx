@@ -10,7 +10,7 @@ export function TaskForm({ onSuccess, onCancel, initialData }) {
         subject: initialData?.subject || '',
         topic: initialData?.topic || '',
         description: initialData?.description || '',
-        due_date: initialData?.due_date ? new Date(initialData.due_date).toISOString().slice(0, 16) : '',
+        due_date: initialData?.due_date ? new Date(initialData.due_date).toISOString().slice(0, 10) : '',
         status: initialData?.status || 'pending'
     });
 
@@ -19,6 +19,10 @@ export function TaskForm({ onSuccess, onCancel, initialData }) {
         setLoading(true);
 
         try {
+            // Append time to ensure it's treated as end of day or just specific date
+            // Using 23:59:59 to imply "by the end of this day"
+            const dateObj = new Date(formData.due_date + 'T23:59:59');
+
             let error;
             if (initialData?.id) {
                 // Update existing
@@ -26,7 +30,7 @@ export function TaskForm({ onSuccess, onCancel, initialData }) {
                     .from('tasks')
                     .update({
                         ...formData,
-                        due_date: new Date(formData.due_date).toISOString()
+                        due_date: dateObj.toISOString()
                     })
                     .eq('id', initialData.id);
                 error = updateError;
@@ -35,7 +39,7 @@ export function TaskForm({ onSuccess, onCancel, initialData }) {
                 const { error: insertError } = await supabase.from('tasks').insert([
                     {
                         ...formData,
-                        due_date: new Date(formData.due_date).toISOString()
+                        due_date: dateObj.toISOString()
                     }
                 ]);
                 error = insertError;
@@ -91,7 +95,7 @@ export function TaskForm({ onSuccess, onCancel, initialData }) {
 
             <Input
                 label="Fecha de Entrega"
-                type="datetime-local"
+                type="date"
                 required
                 className="calendar-dark"
                 value={formData.due_date}
