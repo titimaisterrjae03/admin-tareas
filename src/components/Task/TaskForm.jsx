@@ -4,14 +4,14 @@ import { Button } from '../UI/Button';
 import { Input } from '../UI/Input';
 import toast from 'react-hot-toast';
 
-export function TaskForm({ onSuccess, onCancel }) {
+export function TaskForm({ onSuccess, onCancel, initialData }) {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        subject: '',
-        topic: '',
-        description: '',
-        due_date: '',
-        status: 'pending'
+        subject: initialData?.subject || '',
+        topic: initialData?.topic || '',
+        description: initialData?.description || '',
+        due_date: initialData?.due_date ? new Date(initialData.due_date).toISOString().slice(0, 16) : '',
+        status: initialData?.status || 'pending'
     });
 
     const handleSubmit = async (e) => {
@@ -19,16 +19,31 @@ export function TaskForm({ onSuccess, onCancel }) {
         setLoading(true);
 
         try {
-            const { error } = await supabase.from('tasks').insert([
-                {
-                    ...formData,
-                    due_date: new Date(formData.due_date).toISOString()
-                }
-            ]);
+            let error;
+            if (initialData?.id) {
+                // Update existing
+                const { error: updateError } = await supabase
+                    .from('tasks')
+                    .update({
+                        ...formData,
+                        due_date: new Date(formData.due_date).toISOString()
+                    })
+                    .eq('id', initialData.id);
+                error = updateError;
+            } else {
+                // Create new
+                const { error: insertError } = await supabase.from('tasks').insert([
+                    {
+                        ...formData,
+                        due_date: new Date(formData.due_date).toISOString()
+                    }
+                ]);
+                error = insertError;
+            }
 
             if (error) throw error;
 
-            toast.success('Tarea creada exitosamente');
+            toast.success(initialData ? 'Tarea actualizada' : 'Tarea creada exitosamente');
             onSuccess();
         } catch (error) {
             console.error(error);
@@ -86,7 +101,7 @@ export function TaskForm({ onSuccess, onCancel }) {
             <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>Cancelar</Button>
                 <Button type="submit" disabled={loading} className="w-full md:w-auto">
-                    {loading ? 'Guardando...' : 'Crear Tarea'}
+                    {loading ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear Tarea')}
                 </Button>
             </div>
         </form>
